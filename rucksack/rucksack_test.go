@@ -1,19 +1,21 @@
 package rucksack
 
 import (
-	"log"
+	"math/rand"
 	"testing"
+	"time"
 )
 
-// func createLoot(n int) Loot {
-//     rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-//     l := make(Loot, n)
+func createLoot(n int) Loot {
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	l := make(Loot, n)
 
-//     for i := 0; i < n; i++ {
-//         l[i] = Item{rng.Float64(), rng.Float64()}
-//     }
-//     return l
-// }
+	for i := 0; i < n; i++ {
+		l[i] = Item{rng.Float64(), rng.Float64()}
+	}
+	return l
+}
+
 var testLoot = Loot{
 	{0.17453, 0.36827}, {0.37638, 0.06312}, {0.73349, 0.87194},
 	{0.91805, 0.13192}, {0.75290, 0.06987}, {0.85971, 0.80406},
@@ -88,23 +90,9 @@ func TestCollect(t *testing.T) {
 	if v < ev {
 		t.Fatalf("%f is below %f, (W: %f EW: %f)", v, ev, w, ew)
 	}
-	log.Printf("%s", r)
 }
 
 func TestCollectQuickAndDirty(t *testing.T) {
-	/*
-		expect to find:
-		 W: 1.994050, V: 5.293350, e: %!s(<nil>), ni: 8
-		[
-		{W: 0.174530, V: 0.368270, (relV: 2.110067)},
-		{W: 0.297420, V: 0.652520, (relV: 2.193935)},
-		{W: 0.161680, V: 0.822290, (relV: 5.085910)},
-		{W: 0.130070, V: 0.371710, (relV: 2.857769)},
-		{W: 0.281050, V: 0.919250, (relV: 3.270770)},
-		{W: 0.417220, V: 0.793590, (relV: 1.902090)},
-		{W: 0.001760, V: 0.412800, (relV: 234.545455)},
-		{W: 0.530320, V: 0.952920, (relV: 1.796877)},]
-	*/
 	l := testLoot
 	expect := Rucksack{
 		Loot: Loot{
@@ -131,5 +119,52 @@ func TestCollectQuickAndDirty(t *testing.T) {
 	if v < ev {
 		t.Fatalf("%f is below %f, (W: %f EW: %f)", v, ev, w, ew)
 	}
-	log.Printf("%s", r)
+}
+
+func BenchmarkCollectQuickAndDirty4(b *testing.B) {
+	l := createLoot(4)
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		CollectQuickAndDirty(l, 2)
+	}
+}
+
+func BenchmarkCollectQuickAndDirty8(b *testing.B) {
+	l := createLoot(8)
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		CollectQuickAndDirty(l, 2)
+	}
+}
+
+func BenchmarkCollectQuickAndDirty16(b *testing.B) {
+	l := createLoot(16)
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		CollectQuickAndDirty(l, 2)
+	}
+}
+
+func BenchmarkCollect4(b *testing.B) {
+	l := createLoot(4)
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		Collect(l, 2)
+	}
+}
+
+func BenchmarkCollect8(b *testing.B) {
+	l := createLoot(8)
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		Collect(l, 2)
+	}
+}
+
+func BenchmarkCollect16(b *testing.B) {
+	l := createLoot(16)
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		Collect(l, 2)
+	}
 }

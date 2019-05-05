@@ -2,7 +2,6 @@ package rucksack
 
 import (
 	"fmt"
-	"log"
 	"sort"
 )
 
@@ -88,26 +87,23 @@ func Collect(l Loot, c float64) Rucksack {
 		}
 		_, err := tr.Weight()
 		if err != nil {
-			// log.Print("too heavy")
 			continue
 		}
 		v := tr.Value()
 		if v > r.Value() {
 			r.Loot = tr.Loot
-			// log.Printf("Found a better one W: %v, V: %v", w, v)
 		}
 	}
 	return r
 }
 
-// CollectRealworld takes a Loot and a load maximum and tries to pack
+// CollectQuickAndDirty takes a Loot and a load maximum and tries to pack
 // the greatest value equal or lower than the max load.
 // It'll not be mathematical correct but should render a good result
-// in a pretty short time
+// in a pretty short time and could be optimized further with a subslice
 func CollectQuickAndDirty(l Loot, c float64) Rucksack {
 	r := Rucksack{maxWeight: c}
 	sort.Slice(l, func(i, j int) bool { return l[i].Rel() > l[j].Rel() })
-	log.Print(l)
 	for i := 0; i < len(l); i++ {
 		if l[:i].Weight() > c {
 			break
